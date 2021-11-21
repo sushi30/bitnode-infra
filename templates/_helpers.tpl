@@ -67,3 +67,25 @@ Generate config file
 {{- define "config" -}}
 {{ toYaml .Values.conf | indent 2 }}
 {{- end }}
+
+{{/*
+Common btc exploerer labels
+*/}}
+{{- define "bre.labels" -}}
+helm.sh/chart: {{ include "bitnode.chart" . }}
+app: "explorer"
+{{ include "bitnode.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end }}
+
+{{/*
+Selector labels
+*/}}
+{{- define "bre.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "bitnode.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app: "explorer"
+{{- end }}

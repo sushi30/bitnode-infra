@@ -46,7 +46,7 @@ persistence:
 
 service:
   type: ClusterIP
-  rpcPort: 8332
+  rpcPort: 8334
   p2pPort: 8333
 
 ingress:
@@ -97,3 +97,14 @@ conf:
     rpcpass=p4ssw0rd
     rpclimituser=limituser
     rpclimitpass=L1mp4ssw0rd
+    rpclisten=
+
+btcRpcExplorer:
+  image:
+    repository: sushi30/btc-rpc-explorer
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: "3002"
