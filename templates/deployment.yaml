@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "bitnode.fullname" . }}
+  labels:
+    {{- include "bitnode.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "bitnode.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "bitnode.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "bitnode.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: btcd
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - "-C"
+            - "/etc/btcd/btcd.conf"
+            - "--datadir"
+            - "/btcd"
+          ports:
+            - name: rpc
+              containerPort: {{ .Values.service.rpcPort }}
+            - name: p2p
+              containerPort: {{ .Values.service.p2pPort }}
+          # livenessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+          # readinessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: data
+              mountPath: /btcd
+            - name: config
+              mountPath: /etc/btcd/btcd.conf
+              subPath: btcd.conf
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ template "bitnode.fullname" . }}
+        - name: data
+        {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "bitnode.fullname" .) }}
+        {{- else }}
+          emptyDir: {}
+        {{- end -}}            
