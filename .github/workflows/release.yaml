@@ -1,11 +1,9 @@
-name: ci
+name: release
 
 on:
-  push:
-    branches:
-      - main
+  create:
     tags:
-      - 'v*'
+      - "v*"
 jobs:
   docker:
     runs-on: ubuntu-latest
