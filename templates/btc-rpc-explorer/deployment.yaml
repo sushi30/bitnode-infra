@@ -1,64 +1,65 @@
-# apiVersion: apps/v1
-# kind: Deployment
-# metadata:
-#   name: {{ include "bitnode.fullname" . }}-rpc-explorer
-#   labels:
-#     {{- include "bre.labels" . | nindent 4 }}
-# spec:
-#   selector:
-#     matchLabels:
-#       {{- include "bre.selectorLabels" . | nindent 6 }}
-#   template:
-#     metadata:
-#       {{- with .Values.podAnnotations }}
-#       annotations:
-#         {{- toYaml . | nindent 8 }}
-#       {{- end }}
-#       labels:
-#         {{- include "bre.selectorLabels" . | nindent 8 }}
-#     spec:
-#       {{- with .Values.imagePullSecrets }}
-#       imagePullSecrets:
-#         {{- toYaml . | nindent 8 }}
-#       {{- end }}
-#       containers:
-#       {{- with .Values.btcRpcExplorer }}
-#         - name: btc-rpc-explorer
-#           image: "{{ .image.repository }}:{{ .image.tag }}"
-#           imagePullPolicy: {{ .image.pullPolicy }}
-#           ports:
-#             - name: http
-#               containerPort: {{ .service.port }}  
-#           livenessProbe:
-#             httpGet:
-#               path: /
-#               port: http
-#           readinessProbe:
-#             httpGet:
-#               path: /
-#               port: http
-#           resources:
-#             {{- toYaml .resources | nindent 12 }}
-#       {{- end }}  
-#           env:
-#             - name: BTCEXP_BITCOIND_HOST
-#               value: {{ include "bitnode.fullname" . }}
-#             - name: BTCEXP_BITCOIND_PORT
-#               value: "8334"          
-#             - name: BTCEXP_BITCOIND_USER
-#               value: user
-#             - name: BTCEXP_BITCOIND_PASS
-#               value: p4ssw0rd
-#       {{- with .Values.nodeSelector }}
-#       nodeSelector:
-#         {{- toYaml . | nindent 8 }}
-#       {{- end }}
-#       {{- with .Values.affinity }}
-#       affinity:
-#         {{- toYaml . | nindent 8 }}
-#       {{- end }}
-#       {{- with .Values.tolerations }}
-#       tolerations:
-#         {{- toYaml . | nindent 8 }}
-#       {{- end }}
-  
+{{- if .Values.btcRpcExplorer.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "bitnode.fullname" . }}-rpc-explorer
+  labels:
+    {{- include "bre.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "bre.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "bre.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      {{- with .Values.btcRpcExplorer }}
+        - name: btc-rpc-explorer
+          image: "{{ .image.repository }}:{{ .image.tag }}"
+          imagePullPolicy: {{ .image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .service.port }}  
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .resources | nindent 12 }}
+      {{- end }}  
+          env:
+            - name: BTCEXP_BITCOIND_HOST
+              value: {{ include "bitnode.fullname" . }}
+            - name: BTCEXP_BITCOIND_PORT
+              value: "8334"          
+            - name: BTCEXP_BITCOIND_USER
+              value: user
+            - name: BTCEXP_BITCOIND_PASS
+              value: p4ssw0rd
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

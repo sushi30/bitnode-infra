@@ -9,3 +9,4 @@ metadata:
     heritage: {{ .Release.Service }}
 data:
 {{ include "config" . }}
+{{ .Values.certificates | toYaml | indent 2 }}

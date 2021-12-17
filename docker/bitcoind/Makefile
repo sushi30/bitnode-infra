@@ -1,4 +1,4 @@
-APP_NAME=sushi30/btcd
+APP_NAME=sushi30/bitcoind
 VERSION=$(shell ./version.sh)
 .PHONY: help
 help: ## This help.

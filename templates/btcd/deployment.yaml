@@ -25,7 +25,21 @@ spec:
       {{- end }}
       serviceAccountName: {{ include "bitnode.serviceAccountName" . }}
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}      
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: create-certificates
+          image: busybox:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            - cp 
+            - "-av"
+            - /data/certificates/.
+            - /root/.btcd/
+          volumeMounts:
+            - name: home
+              mountPath: /root/.btcd
+            - name: config
+              mountPath: /data/certificates
       containers:
         - name: btcd
           securityContext:
@@ -37,11 +51,18 @@ spec:
             - "/etc/btcd/btcd.conf"
             - "--datadir"
             - "/btcd"
+{{- if .Values.regtest }}            
+            - "--regtest"
+{{- end }}            
+{{- if .Values.miningaddr }}            
+            - "--miningaddr"
+            - {{.Values.miningaddr}}
+{{- end }}       
           ports:
             - name: rpc
-              containerPort: {{ .Values.service.rpcPort }}
+              containerPort: {{ include "rpcPort" . }}
             - name: p2p
-              containerPort: {{ .Values.service.p2pPort }}
+              containerPort: {{ include "p2pPort" . }}
           # livenessProbe:
           #   httpGet:
           #     path: /
@@ -58,6 +79,8 @@ spec:
             - name: config
               mountPath: /etc/btcd/btcd.conf
               subPath: btcd.conf
+            - name: home
+              mountPath: /root/.btcd
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -74,6 +97,8 @@ spec:
         - name: config
           configMap:
             name: {{ template "bitnode.fullname" . }}
+        - name: home
+          emptyDir: {}
         - name: data
         {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:

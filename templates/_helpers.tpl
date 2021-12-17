@@ -89,3 +89,16 @@ app.kubernetes.io/name: {{ include "bitnode.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 app: "explorer"
 {{- end }}
+
+{{- define "p2pPort" }}
+{{- if .Values.regtest }}18334
+{{- else if .Values.testnet }}18334
+{{- else }}8333{{- end }}
+{{- end }}
+
+{{- define "rpcPort" }}
+{{- if .Values.regtest }}18444
+{{- else if .Values.testnet }}18333
+{{- else }}8334
+{{- end }}
+{{- end }}

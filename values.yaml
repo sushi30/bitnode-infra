@@ -3,7 +3,8 @@
 # Declare variables to be passed into your templates.
 
 replicaCount: 1
-
+testnet: false
+regtest: false
 image:
   repository: sushi30/btcd
   pullPolicy: IfNotPresent
@@ -46,8 +47,6 @@ persistence:
 
 service:
   type: ClusterIP
-  rpcPort: 8334
-  p2pPort: 8333
 
 ingress:
   enabled: false
@@ -97,9 +96,10 @@ conf:
     rpcpass=p4ssw0rd
     rpclimituser=limituser
     rpclimitpass=L1mp4ssw0rd
-    rpclisten=
+    debuglevel=info
 
 btcRpcExplorer:
+  enabled: False
   image:
     repository: sushi30/btc-rpc-explorer
     pullPolicy: IfNotPresent
@@ -108,3 +108,5 @@ btcRpcExplorer:
   service:
     type: ClusterIP
     port: "3002"
+
+certificates: []

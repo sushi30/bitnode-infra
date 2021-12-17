@@ -8,10 +8,10 @@ spec:
   type: {{ .Values.service.type }}
   ports:
     - name: rpc
-      port: {{ .Values.service.rpcPort }}
+      port: {{ include "rpcPort" . }}
       targetPort: rpc
     - name: p2p
-      port: {{ .Values.service.p2pPort }}
+      port: {{ include "p2pPort" . }}
       targetPort: p2p
   selector:
     {{- include "bitnode.selectorLabels" . | nindent 4 }}
