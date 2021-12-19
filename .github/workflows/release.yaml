@@ -1,7 +1,7 @@
 name: "Build and release docker image"
 
 on:
-  push:
+  create:
     tags:
       - "v*"
 
@@ -15,7 +15,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            return context.payload.ref.replace(/\/refs\/tags\//, '');
+            return context.payload.ref.replace(/refs\/tags\//, '');
       - name: Echo
         run: echo ${{ steps.tag.outputs.result }}
       - name: Set up QEMU
